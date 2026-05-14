@@ -1,5 +1,8 @@
 [
-  { "Url": "https://vxinstagram.com", "IsDefault": true },
-  { "Url": "http://eeinstagram.com", "Gallery": true },
-  { "Url": "https://uuinstagram.com", "Gallery": true }
+  { "Url": "https://vxinstagram.com", "Direct": {} },
+  { "Url": "https://eeinstagram.com", "Normal": {}, "Direct": { "Query":  { "direct": "true" } }, "Gallery": { "Query":  { "gallery": "true" } } },
+  { "Url": "https://uuinstagram.com", "Normal": {}, "Direct": { "Query":  { "direct": "true" } }, "Gallery": { "Query":  { "gallery": "true" } } },
+  { "Url": "https://fxstagram.com", "Normal": {}, "Direct": { "Query":  { "direct": "true" } }, "Gallery": { "Query":  { "gallery": "true" } } },
+  { "Url": "https://kkinstagram.com", "Direct": {} },
+  { "Url": "https://instafix.zzinstagram.com", "Normal": {}, "Direct": { "Query":  { "direct": "true" } }, "Gallery": { "Query":  { "gallery": "true" } } }
 ]

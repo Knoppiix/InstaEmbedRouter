@@ -1,21 +1,34 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
-	"github.com/Knoppiix/InstagramEmbedResolver/metrics"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/Knoppiix/InstagramEmbedResolver/metrics"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var errorLog = log.New(os.Stderr, "ERROR: ", log.LstdFlags)
 
-var routes = []string{"/p/", "/reels/", "/reel/"}
+var routes = []string{
+	"/p/{id}",
+	"/p/{id}/{$}",
+	"/reels/{id}",
+	"/reels/{id}/{$}",
+	"/reel/{id}",
+	"/reel/{id}/{$}",
+	"/{username}/p/{id}",
+	"/{username}/p/{id}/{$}",
+	"/{username}/reel/{id}",
+	"/{username}/reel/{id}/{$}",
+	"/share/{id}",
+	"/share/{id}/{$}",
+}
 var defaultRes Resolver
 
 func startServer(resolvers []Resolver, port int) {
@@ -39,17 +52,6 @@ func startServer(resolvers []Resolver, port int) {
 func reqHandler(resolvers []Resolver) http.HandlerFunc {
 	// handler function for proxifying the requests to the resolvers
 	return func(w http.ResponseWriter, r *http.Request) {
-		routeHit := ""
-		for _, route := range routes {
-			if strings.HasPrefix(r.URL.Path, route) {
-				routeHit = route
-				break
-			}
-		}
-		if routeHit == "" {
-			http.NotFound(w, r)
-			return
-		}
 
 		// If the request is from discord OR telegram, we proxify the request through the resolver
 		ua := r.Header.Get("User-Agent")
@@ -59,25 +61,19 @@ func reqHandler(resolvers []Resolver) http.HandlerFunc {
 		}
 		// Else, we simply redirect the user to the instagram post
 
-		// Extract the post ID
-		id := strings.TrimPrefix(r.URL.Path, routeHit)
+		// Extract the img_index query parameter if it exists
+		imgIndex := r.URL.Query().Get("img_index")
+		var query string
+		if imgIndex != "" {
+			query = fmt.Sprintf("?img_index=%s", imgIndex)
+		}
 		// Construct the redirect URL
-		redirectURL := "https://www.instagram.com" + routeHit + id
+		redirectURL := "https://instagram.com" + r.URL.Path + query
 
 		// Send HTTP 302 redirect
 		http.Redirect(w, r, redirectURL, http.StatusFound)
 		log.Printf("User redirection toward %s", redirectURL)
 	}
-}
-
-func findDefaultResolver(res []Resolver) (Resolver, error) {
-	for _, res := range res {
-		if ok, err := res.isDefault(); err == nil && ok {
-			return res, nil
-			//fmt.Printf("%s is the default resolver.", res.Url)
-		}
-	}
-	return Resolver{}, errors.New("No default resolver was found. Default resolving error behaviour is falling back to a HTTP return.")
 }
 
 func main() {
@@ -87,10 +83,6 @@ func main() {
 	resolvers, err := loadResolvers("resolvers.json")
 	if err != nil {
 		log.Fatalf("Error reading the file: %v", err)
-	}
-	defaultRes, err = findDefaultResolver(resolvers)
-	if err != nil {
-		fmt.Printf("WARNING - No default resolver was specified.")
 	}
 	metrics.Init()
 	go monitorResolvers(resolvers)

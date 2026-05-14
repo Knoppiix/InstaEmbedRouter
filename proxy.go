@@ -2,8 +2,6 @@ package main
 
 import (
 	"bytes"
-	"github.com/Knoppiix/InstagramEmbedResolver/metrics"
-	"github.com/PuerkitoBio/goquery"
 	"io"
 	"log"
 	"net/http"
@@ -11,6 +9,9 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/Knoppiix/InstagramEmbedResolver/metrics"
+	"github.com/PuerkitoBio/goquery"
 )
 
 var metaProps = map[string]bool{
@@ -80,13 +81,28 @@ func sendReqToResolver(req *http.Request, client *http.Client, resolver Resolver
 	}
 
 	// if using a specific mode (gallery, media-only) we check if the current resolver is able to handle it
-	if !isResolverEligible(req, resolver) {
+	renderMode := getRenderMode(req, resolver)
+	if renderMode == nil {
 		log.Printf("The current resolver is not compatible with the request mode.")
 		return
 	}
 
+	q := url.Values{}
+	if imgIndex := req.URL.Query().Get("img_index"); imgIndex != "" {
+		q.Set("img_index", imgIndex)
+	}
+	for k, v := range renderMode.Query {
+		q.Set(k, v)
+	}
+
+	// if the user specified functional parameters (like ?image_index) we encode them
+	query := ""
+	if len(q) > 0 {
+		query = "?" + q.Encode()
+	}
+
 	// "sanitizing" the URL so we don't carry additionnal parameters (like the ?igsh)
-	fullUrl := u.Scheme + "://" + u.Host + req.URL.Path + "?" + req.URL.RawQuery
+	fullUrl := u.Scheme + "://" + renderMode.Subdomain + u.Host + req.URL.Path + query
 	response.startTime = time.Now()
 	resp, err := client.Get(fullUrl)
 	if err != nil {
@@ -151,27 +167,23 @@ func getMetaTags(doc *goquery.Document) []string {
 	return tags
 }
 
-func isResolverEligible(req *http.Request, res Resolver) bool {
+func getRenderMode(req *http.Request, res Resolver) *RenderMode {
 	host := req.Host
 	host = strings.Split(host, ":")[0] // get rid of the port
 	sub := getSubdomain(host)
 
 	switch sub {
-	// gallery mode
-	case "g.":
-		if res.Gallery {
-			// Instafix's way to enable "gallery mode" (i.e remove the post desc. from embed) is to add this parameter to the URL
-			req.URL.RawQuery = "gallery=true"
-			return true
-		}
-	// subdomain I'm personnally using for testing purpose - whitelisting it here
-	case "tst.":
-		req.Host = strings.ReplaceAll(req.Host, "tst.", "")
-		return true
-	case "":
-		return true
+	case "g":
+		return res.Gallery
+	case "d":
+		return res.Direct
+	case "n":
+		return res.Normal
+	case "tst", "":
+		// subdomain used for tests only
+		return &RenderMode{}
 	}
-	return false
+	return nil
 }
 
 func getSubdomain(host string) string {
@@ -181,7 +193,7 @@ func getSubdomain(host string) string {
 	if len(parts) < 3 || parts[0] == "www" {
 		return "" // no subdomain
 	}
-	return parts[0] + "."
+	return parts[0]
 }
 
 // Cleaning the HTML body and replacing the relative URLs from the meta video tags to absolute paths
