@@ -6,7 +6,7 @@ You can simply use it within Discord and Telegram by adding "zz" before "instagr
 ## Features supported
 The following features are supported :
 | Subdomain | Description | Video handling  | Image Index | Description |
-| --- | --- | --- | --- | --- |
+| --- | :-: | :-: | :-: | --- |
 | g.zzinstagram.com |   | ✅ | ✅ | Embed the post without a description |
 | d.zzinstagram.com |   | ✅ |   | Embed the post without integration frame |
 | n.zzinstagram.com | ✅ | ✅ | ✅ | The normal way to embed posts (description + username) |
