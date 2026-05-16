@@ -38,6 +38,10 @@ func proxyRequest(w http.ResponseWriter, req *http.Request, resolvers []Resolver
 	var resolversResponses []resolverResponse
 
 	for _, resolver := range resolvers {
+		isUp := resolver.IsUp
+		if !isUp {
+			continue
+		}
 		go sendReqToResolver(req, client, resolver, resultCh)
 	}
 
@@ -51,6 +55,9 @@ func proxyRequest(w http.ResponseWriter, req *http.Request, resolvers []Resolver
 			recordResolverMetrics(response)
 			return
 		} else if response.hasImage {
+			// We don’t instantly send the response to the client here, because some Instagram Reels are sometimes wrongly
+			// embedded as images from some resolvers (when the scraper can’t fetch the video correctly, it only displays a thumbnail)
+			// So it’s more reliable to wait for other resolvers’ responses to be sure it's a picture post
 			resolversResponses = append(resolversResponses, response)
 		}
 	}
