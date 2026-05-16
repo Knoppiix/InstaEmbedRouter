@@ -10,7 +10,6 @@ The following features are supported :
 | g.zzinstagram.com |   | ✅ | ✅ | Embed the post without a description |
 | d.zzinstagram.com |   | ✅ |   | Embed the post without integration frame |
 | n.zzinstagram.com | ✅ | ✅ | ✅ | The normal way to embed posts (description + username) |
-<br>
 
 ## How to build 
 Make sure you have [Golang](https://go.dev/) installed, and run `go build .` within the project directory.
