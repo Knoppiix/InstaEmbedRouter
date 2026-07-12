@@ -1,15 +1,120 @@
 <html>
 	<head>
 		<title>Instagram embedding proxy</title>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 	</head>
 
 	<body>
 		<p>Service is running OK!</p>
 		<p>Add zz before instagram.com to fix embeds (https://<b>zz</b>instagram.com/p/{id} for example)</p>
-                <iframe src="https://grafana.zzinstagram.com/d-solo/admv6k8/instaembedrouter-totalrequests?orgId=1&timezone=browser&theme=light&panelId=panel-1&__feature.dashboardSceneSolo=true" width="675" height="300" frameborder="0"></iframe>
-                <iframe src="https://grafana.zzinstagram.com/d-solo/admv6k8/instaembedrouter-totalrequests?orgId=1&timezone=browser&theme=light&panelId=panel-2&__feature.dashboardSceneSolo=true" width="675" height="300" frameborder="0" style="display: block;"></iframe>
-		<iframe src="http://localhost:10001/d-solo/admv6k8/instaembedrouter-totalrequests?orgId=1&timezone=browser&refresh=30s&theme=light&panelId=panel-3&__feature.dashboardSceneSolo=true" width="675" height="300" frameborder="0"></iframe>
+
+		<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+			<div style="height: 300px;">
+				<canvas id="successChart"></canvas>
+			</div>
+			<div style="height: 300px;">
+				<canvas id="requestsChart"></canvas>
+			</div>
+			<div style="height: 300px;">
+				<canvas id="latencyChart"></canvas>
+			</div>
+		</div>
+
+		<script>
+			Chart.register(ChartDataLabels);
+
+			function shortResolverName(url) {
+				return url.replace(/^https?:\/\//, "");
+			}
+
+			async function fetchJSON(path) {
+				const resp = await fetch(path);
+				if (!resp.ok) {
+					throw new Error(`${path} returned ${resp.status}`);
+				}
+				return resp.json();
+			}
+
+			async function renderSuccessChart() {
+				const points = await fetchJSON("/api/stats/success");
+				new Chart(document.getElementById("successChart"), {
+					type: "bar",
+					data: {
+						labels: points.map(p => shortResolverName(p.resolver)),
+						datasets: [{
+							label: "Successful embeds",
+							data: points.map(p => p.value),
+							backgroundColor: "#4e79a7",
+						}],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							title: { display: true, text: "Successful embeds per resolver" },
+							datalabels: { anchor: "end", align: "top", font: { weight: "bold" } },
+						},
+						scales: { y: { beginAtZero: true } },
+					},
+				});
+			}
+
+			async function renderRequestsChart() {
+				const points = await fetchJSON("/api/stats/requests-timeseries");
+				new Chart(document.getElementById("requestsChart"), {
+					type: "line",
+					data: {
+						labels: points.map(p => new Date(p.timestamp * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
+						datasets: [{
+							label: "Requests (per 10min)",
+							data: points.map(p => p.value),
+							borderColor: "#f28e2b",
+							backgroundColor: "#f28e2b",
+							tension: 0.2,
+							pointRadius: 0,
+						}],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							title: { display: true, text: "Requests over the last 24h" },
+							datalabels: { display: false },
+						},
+						scales: { y: { beginAtZero: true } },
+					},
+				});
+			}
+
+			async function renderLatencyChart() {
+				const points = await fetchJSON("/api/stats/latency");
+				new Chart(document.getElementById("latencyChart"), {
+					type: "bar",
+					data: {
+						labels: points.map(p => shortResolverName(p.resolver)),
+						datasets: [{
+							label: "Avg latency (ms)",
+							data: points.map(p => Math.round(p.value * 1000)),
+							backgroundColor: "#59a14f",
+						}],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							title: { display: true, text: "Average latency per resolver (last 24h)" },
+							datalabels: { anchor: "end", align: "top", font: { weight: "bold" } },
+						},
+						scales: { y: { beginAtZero: true } },
+					},
+				});
+			}
+
+			renderSuccessChart().catch(console.error);
+			renderRequestsChart().catch(console.error);
+			renderLatencyChart().catch(console.error);
+		</script>
 	</body>
 
 </html>
-
