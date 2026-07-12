@@ -46,6 +46,11 @@ func startServer(resolvers []Resolver, port int) {
 	// expose the prometheus metrics route
 	mux.Handle("GET /metrics", promhttp.Handler())
 
+	// stats endpoints backing the dashboard charts on "/", proxying pre-set PromQL queries to Prometheus
+	mux.HandleFunc("GET /api/stats/success", statsSuccessHandler)
+	mux.HandleFunc("GET /api/stats/latency", statsLatencyHandler)
+	mux.HandleFunc("GET /api/stats/requests-timeseries", statsRequestsTimeseriesHandler)
+
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), mux))
 }
 
