@@ -22,4 +22,4 @@ Execute with:
 Default listening port is `8080` if none is specified.
 
 ## Credits
-As this app is only acting as a proxy, it relies on other instagram embedding softwares such as [Instafix](https://github.com/Wikidepia/InstaFix/) and [vxinstagram](https://github.com/Lainmode/InstagramEmbed-vxinstagram).
+As this app is only acting as a proxy, it relies on other instagram embedding softwares such as [Instafix](https://github.com/Wikidepia/InstaFix/), [vxinstagram](https://github.com/Lainmode/InstagramEmbed-vxinstagram), [OGInstagram](https://github.com/seirenkr/OGInstagram) and [InstafixRevived](https://github.com/Bl0ck154/InstaFix-Revived)
