@@ -12,8 +12,14 @@ type RenderMode struct {
 	Subdomain string
 }
 
+// User agent used when proxying to a resolver that doesn't set its own in
+// resolvers.json. We mimic Discord because that's the client we're proxying for,
+// and the resolvers tailor their output to it.
+const defaultUserAgent = "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)"
+
 type Resolver struct {
 	Url         string
+	UserAgent   string
 	UptimeStart time.Time
 	Latency     time.Duration
 	IsUp        bool
@@ -21,6 +27,18 @@ type Resolver struct {
 	Normal      *RenderMode
 	Gallery     *RenderMode
 	Direct      *RenderMode
+}
+
+// effectiveUserAgent falls back to the default when the "UserAgent" key is
+// absent from resolvers.json. Going through this instead of reading the field
+// directly also avoids sending an empty User-Agent header: net/http treats an
+// explicitly-set empty value as "send no user agent at all", which most
+// resolvers reject.
+func (r Resolver) effectiveUserAgent() string {
+	if r.UserAgent == "" {
+		return defaultUserAgent
+	}
+	return r.UserAgent
 }
 
 func (r *Resolver) IsHttpUp() (bool, error) {
