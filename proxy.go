@@ -117,7 +117,8 @@ func proxyRequest(w http.ResponseWriter, req *http.Request, resolvers []Resolver
 	// resolver is down, leaking the goroutine, the parsed documents it holds
 	// and the client connection along with it.
 	up := make([]Resolver, 0, len(resolvers))
-	for _, resolver := range resolvers {
+
+  for _, resolver := range resolvers {
 		if resolver.IsUp {
 			up = append(up, resolver)
 		}
