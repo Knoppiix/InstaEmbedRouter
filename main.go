@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/Knoppiix/InstagramEmbedResolver/metrics"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -51,7 +52,19 @@ func startServer(resolvers []Resolver, port int) {
 	mux.HandleFunc("GET /api/stats/latency", statsLatencyHandler)
 	mux.HandleFunc("GET /api/stats/requests-timeseries", statsRequestsTimeseriesHandler)
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), mux))
+	// Explicit timeouts: with the bare ListenAndServe defaults (none), slow or
+	// abandoned client connections pile up indefinitely.
+	srv := &http.Server{
+		Addr:              fmt.Sprintf(":%d", port),
+		Handler:           mux,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		// Must stay above proxyTimeout so a slow fan-out isn't cut mid-response.
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	log.Fatal(srv.ListenAndServe())
 }
 
 func reqHandler(resolvers []Resolver) http.HandlerFunc {
