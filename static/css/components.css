@@ -1,0 +1,148 @@
+/* Reusable neobrutalist components. Page-specific layout lives in app.css --
+   nothing here knows anything about this particular page, so these classes can
+   be lifted into any other view. */
+
+/* --- Surfaces ------------------------------------------------------------ */
+
+/* The workhorse container. */
+.nb-card {
+	background: var(--nb-surface);
+	border: var(--nb-border);
+	border-radius: var(--nb-radius);
+	box-shadow: var(--nb-shadow);
+	padding: var(--nb-gap);
+}
+
+/* A card that is meant to shout: bigger shadow, accent fill. */
+.nb-panel {
+	background: var(--nb-surface);
+	border: var(--nb-border-thick);
+	border-radius: var(--nb-radius);
+	box-shadow: var(--nb-shadow-lg);
+	padding: var(--nb-gap);
+}
+
+/* --- Badge --------------------------------------------------------------- */
+
+.nb-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5ch;
+	background: var(--nb-surface);
+	border: var(--nb-border);
+	border-radius: var(--nb-radius);
+	box-shadow: var(--nb-shadow-sm);
+	padding: 0.35rem 0.9rem;
+	font-family: var(--nb-font-mono);
+	font-weight: 700;
+	font-size: 0.85rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--nb-ink);
+}
+
+/* State is carried by the label text too, never by colour alone. */
+.nb-badge__dot {
+	width: 0.6em;
+	height: 0.6em;
+	border: var(--nb-border-thin);
+	background: var(--nb-ink);
+}
+
+/* --- Button -------------------------------------------------------------- */
+
+.nb-btn {
+	display: inline-block;
+	background: var(--nb-yellow);
+	color: var(--nb-ink);
+	border: var(--nb-border);
+	border-radius: var(--nb-radius);
+	box-shadow: var(--nb-shadow);
+	/* Padding is generous so the clickable area clears 24x24 -- border bulk is
+	   not clickable area. */
+	padding: 12px 24px;
+	font-family: var(--nb-font-body);
+	font-weight: 700;
+	font-size: 1rem;
+	text-decoration: none;
+	cursor: pointer;
+	transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.nb-btn:hover {
+	transform: translate(-2px, -2px);
+	box-shadow: var(--nb-shadow-lg);
+}
+
+/* Pressed: the element moves into where its shadow was. */
+.nb-btn:active {
+	transform: translate(3px, 3px);
+	box-shadow: none;
+}
+
+.nb-btn:focus-visible {
+	outline: var(--nb-focus);
+	outline-offset: var(--nb-focus-offset);
+}
+
+/* --- Inline code / token ------------------------------------------------- */
+
+.nb-code {
+	display: inline-block;
+	background: var(--nb-bg);
+	border: var(--nb-border-thin);
+	border-radius: var(--nb-radius);
+	box-shadow: var(--nb-shadow-sm);
+	padding: 0.5rem 0.85rem;
+	font-family: var(--nb-font-mono);
+	font-size: 1rem;
+	color: var(--nb-ink);
+	word-break: break-all;
+}
+
+/* --- Link ---------------------------------------------------------------- */
+
+.nb-link {
+	color: var(--nb-ink);
+	font-weight: 700;
+	text-decoration: none;
+	/* Underline as a real border so it keeps the hard-edged look. */
+	border-bottom: var(--nb-border);
+	padding-bottom: 1px;
+}
+
+.nb-link:hover {
+	background: var(--nb-yellow);
+}
+
+.nb-link:focus-visible {
+	outline: var(--nb-focus);
+	outline-offset: 2px;
+}
+
+/* --- Accent fills -------------------------------------------------------- */
+
+/* Utilities, so they come last and win over a component's own background.
+   Black text on all of them: these are fills, never text colours -- the
+   accents don't carry enough contrast to be read against white. */
+.nb-fill-yellow { background: var(--nb-yellow); }
+.nb-fill-pink { background: var(--nb-pink); }
+.nb-fill-blue { background: var(--nb-blue); }
+.nb-fill-green { background: var(--nb-green); }
+.nb-fill-orange { background: var(--nb-orange); }
+.nb-fill-lavender { background: var(--nb-lavender); }
+
+/* --- Reduced motion ------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+	.nb-btn,
+	.nb-card,
+	.nb-panel {
+		transition: none;
+	}
+
+	.nb-btn:hover,
+	.nb-btn:active {
+		transform: none;
+	}
+}

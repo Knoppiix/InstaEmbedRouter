@@ -1,0 +1,128 @@
+/* Layout for the status page. Component looks live in components.css. */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: var(--nb-bg);
+	color: var(--nb-ink);
+	font-family: var(--nb-font-body);
+	line-height: 1.6;
+}
+
+.page {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: var(--nb-gap-lg) var(--nb-gap);
+	display: flex;
+	flex-direction: column;
+	gap: var(--nb-gap-lg);
+}
+
+/* --- Masthead ------------------------------------------------------------ */
+
+.masthead {
+	text-align: center;
+}
+
+.masthead__title {
+	margin: 0;
+	font-family: var(--nb-font-display);
+	font-weight: 800;
+	/* The one loud display scale. Nothing else on the page competes with it. */
+	font-size: clamp(2.5rem, 9vw, 5rem);
+	letter-spacing: -0.03em;
+	line-height: 1;
+	text-transform: lowercase;
+}
+
+.masthead__sub {
+	margin: var(--nb-gap-sm) 0 0;
+	font-family: var(--nb-font-mono);
+	font-size: 0.95rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+/* --- Status ------------------------------------------------------------- */
+
+.status {
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--nb-gap);
+}
+
+.status__headline {
+	margin: 0;
+	font-family: var(--nb-font-display);
+	font-weight: 800;
+	font-size: clamp(1.75rem, 5vw, 3rem);
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+}
+
+/* --- Usage hint ---------------------------------------------------------- */
+
+.usage {
+	text-align: center;
+}
+
+.usage__lead {
+	margin: 0 0 var(--nb-gap-sm);
+	font-size: clamp(1.05rem, 2.5vw, 1.35rem);
+	font-weight: 700;
+}
+
+.usage__lead b {
+	/* The "zz" is the whole point of the sentence, so it gets the highlight. */
+	background: var(--nb-yellow);
+	border: var(--nb-border-thin);
+	padding: 0 0.25rem;
+}
+
+/* --- Charts -------------------------------------------------------------- */
+
+.charts {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	gap: var(--nb-gap);
+}
+
+.chart {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--nb-gap-sm);
+}
+
+.chart__title {
+	font-family: var(--nb-font-display);
+	font-weight: 700;
+	font-size: 1.1rem;
+	line-height: 1.2;
+	/* Sits in a tinted strip so the card reads as titled, not just captioned. */
+	background: var(--nb-bg);
+	border: var(--nb-border-thin);
+	padding: 0.5rem 0.75rem;
+}
+
+.chart__canvas {
+	position: relative;
+	height: 300px;
+}
+
+/* --- Footer -------------------------------------------------------------- */
+
+.footer {
+	text-align: center;
+	font-family: var(--nb-font-mono);
+	font-size: 0.9rem;
+	padding-top: var(--nb-gap);
+	border-top: var(--nb-border-thick);
+}

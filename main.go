@@ -41,6 +41,10 @@ func startServer(resolvers []Resolver, port int) {
 		template.Execute(w, "")
 	})
 
+	staticFiles := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
+	mux.Handle("GET /static/css/{file}", staticFiles)
+	mux.Handle("GET /static/js/{file}", staticFiles)
+
 	for _, route := range routes {
 		mux.HandleFunc("GET "+route, reqHandler(resolvers))
 	}

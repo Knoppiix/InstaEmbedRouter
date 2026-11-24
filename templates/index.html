@@ -1,120 +1,69 @@
-<html>
-	<head>
-		<title>Instagram embedding proxy</title>
-		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-	</head>
+<!DOCTYPE html>
+<html lang="en">
 
-	<body>
-		<p>Service is running OK!</p>
-		<p>Add zz before instagram.com to fix embeds (https://<b>zz</b>instagram.com/p/{id} for example)</p>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Instagram embedding proxy</title>
 
-		<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
-			<div style="height: 300px;">
-				<canvas id="successChart"></canvas>
-			</div>
-			<div style="height: 300px;">
-				<canvas id="requestsChart"></canvas>
-			</div>
-			<div style="height: 300px;">
-				<canvas id="latencyChart"></canvas>
-			</div>
-		</div>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap">
 
-		<script>
-			Chart.register(ChartDataLabels);
+	<link rel="stylesheet" href="/static/css/tokens.css">
+	<link rel="stylesheet" href="/static/css/components.css">
+	<link rel="stylesheet" href="/static/css/app.css">
 
-			function shortResolverName(url) {
-				return url.replace(/^https?:\/\//, "");
-			}
+	<!-- defer keeps execution order, so charts.js always runs after Chart.js -->
+	<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels" defer></script>
+	<script src="/static/js/charts.js" defer></script>
+</head>
 
-			async function fetchJSON(path) {
-				const resp = await fetch(path);
-				if (!resp.ok) {
-					throw new Error(`${path} returned ${resp.status}`);
-				}
-				return resp.json();
-			}
+<body>
+	<div class="page">
 
-			async function renderSuccessChart() {
-				const points = await fetchJSON("/api/stats/success");
-				new Chart(document.getElementById("successChart"), {
-					type: "bar",
-					data: {
-						labels: points.map(p => shortResolverName(p.resolver)),
-						datasets: [{
-							label: "Successful embeds",
-							data: points.map(p => p.value),
-							backgroundColor: "#4e79a7",
-						}],
-					},
-					options: {
-						responsive: true,
-						maintainAspectRatio: false,
-						plugins: {
-							title: { display: true, text: "Successful embeds per resolver" },
-							datalabels: { anchor: "end", align: "top", font: { weight: "bold" } },
-						},
-						scales: { y: { beginAtZero: true } },
-					},
-				});
-			}
+		<header class="masthead">
+			<h1 class="masthead__title">zzinstagram</h1>
+			<p class="masthead__sub">Instagram embedding proxy</p>
+		</header>
 
-			async function renderRequestsChart() {
-				const points = await fetchJSON("/api/stats/requests-timeseries");
-				new Chart(document.getElementById("requestsChart"), {
-					type: "line",
-					data: {
-						labels: points.map(p => new Date(p.timestamp * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
-						datasets: [{
-							label: "Requests (per 10min)",
-							data: points.map(p => p.value),
-							borderColor: "#f28e2b",
-							backgroundColor: "#f28e2b",
-							tension: 0.2,
-							pointRadius: 0,
-						}],
-					},
-					options: {
-						responsive: true,
-						maintainAspectRatio: false,
-						plugins: {
-							title: { display: true, text: "Requests over the last 24h" },
-							datalabels: { display: false },
-						},
-						scales: { y: { beginAtZero: true } },
-					},
-				});
-			}
+		<section class="status">
+			<span class="nb-badge nb-fill-green">
+				<span class="nb-badge__dot"></span>
+				Online
+			</span>
+		</section>
 
-			async function renderLatencyChart() {
-				const points = await fetchJSON("/api/stats/latency");
-				new Chart(document.getElementById("latencyChart"), {
-					type: "bar",
-					data: {
-						labels: points.map(p => shortResolverName(p.resolver)),
-						datasets: [{
-							label: "Avg latency (ms)",
-							data: points.map(p => Math.round(p.value * 1000)),
-							backgroundColor: "#59a14f",
-						}],
-					},
-					options: {
-						responsive: true,
-						maintainAspectRatio: false,
-						plugins: {
-							title: { display: true, text: "Average latency per resolver (last 24h)" },
-							datalabels: { anchor: "end", align: "top", font: { weight: "bold" } },
-						},
-						scales: { y: { beginAtZero: true } },
-					},
-				});
-			}
+		<section class="nb-panel nb-fill-yellow usage">
+			<p class="usage__lead">Add <b>zz</b> before instagram.com to fix embeds</p>
+			<p class="nb-code">https://<b>zz</b>instagram.com/p/{id}</p>
+		</section>
 
-			renderSuccessChart().catch(console.error);
-			renderRequestsChart().catch(console.error);
-			renderLatencyChart().catch(console.error);
-		</script>
-	</body>
+		<section class="charts">
+			<figure class="nb-card chart">
+				<figcaption class="chart__title">Successful embeds per resolver</figcaption>
+				<div class="chart__canvas"><canvas id="successChart"></canvas></div>
+			</figure>
+
+			<figure class="nb-card chart">
+				<figcaption class="chart__title">Requests over the last 24h</figcaption>
+				<div class="chart__canvas"><canvas id="requestsChart"></canvas></div>
+			</figure>
+
+			<figure class="nb-card chart">
+				<figcaption class="chart__title">Average latency per resolver (last 24h)</figcaption>
+				<div class="chart__canvas"><canvas id="latencyChart"></canvas></div>
+			</figure>
+		</section>
+
+		<footer class="footer">
+			<a class="nb-link" href="https://github.com/Knoppiix/InstaEmbedRouter" target="_blank"
+				rel="noopener noreferrer">Source on GitHub</a>
+		</footer>
+
+	</div>
+</body>
 
 </html>

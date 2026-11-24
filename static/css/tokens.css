@@ -1,0 +1,48 @@
+/* Design tokens. Everything visual is defined here and nowhere else, so the
+   look can be retuned from a single file -- including the charts, which read
+   these same values from JavaScript via getComputedStyle. */
+
+:root {
+	/* Palette: one neutral base, one dark outline, a few saturated accents.
+	   Accents are fills only -- never text colours, they don't pass contrast. */
+	--nb-ink: #000000;
+	--nb-bg: #fffdf5;
+	--nb-surface: #ffffff;
+
+	--nb-yellow: #ffd23f;
+	--nb-pink: #ff6b6b;
+	--nb-blue: #74b9ff;
+	--nb-green: #88d498;
+	--nb-orange: #ffa552;
+	--nb-lavender: #b8a9fa;
+
+	/* Structure. The border is the main structural signifier, so it is a single
+	   canonical stroke width with two deliberate variants. */
+	--nb-border-width: 3px;
+	--nb-border: var(--nb-border-width) solid var(--nb-ink);
+	--nb-border-thin: 2px solid var(--nb-ink);
+	--nb-border-thick: 4px solid var(--nb-ink);
+	--nb-radius: 0;
+
+	/* Hard shadows. The blur is always zero -- that is the whole point.
+	   Four steps so hierarchy survives; if everything gets the same aggressive
+	   shadow, hierarchy collapses. */
+	--nb-shadow-sm: 3px 3px 0 0 var(--nb-ink);
+	--nb-shadow: 5px 5px 0 0 var(--nb-ink);
+	--nb-shadow-lg: 8px 8px 0 0 var(--nb-ink);
+	--nb-shadow-xl: 12px 12px 0 0 var(--nb-ink);
+
+	/* Type: loud display, boring body on purpose, mono for data and labels. */
+	--nb-font-display: "Syne", "Arial Black", system-ui, sans-serif;
+	--nb-font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+	--nb-font-mono: "Space Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+	/* Spacing scale, kept small on purpose. */
+	--nb-gap-sm: 0.75rem;
+	--nb-gap: 1.5rem;
+	--nb-gap-lg: 2.5rem;
+
+	/* Focus ring. Thick borders must not swallow it, hence the offset. */
+	--nb-focus: 3px solid var(--nb-blue);
+	--nb-focus-offset: 3px;
+}
